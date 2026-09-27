@@ -3,8 +3,8 @@ package greek_test
 import (
 	"testing"
 
-	"github.com/blevesearch/snowballstem"
 	"github.com/axiomhq/snowballx/greek"
+	"github.com/blevesearch/snowballstem"
 )
 
 // Every 1,500th pair of snowball-data greek/voc.txt and greek/output.txt.
