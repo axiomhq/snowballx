@@ -4,12 +4,13 @@
 go get github.com/axiomhq/snowballx
 ```
 
-Four packages, three of them on top of the Go Snowball runtime, `github.com/blevesearch/snowballstem`:
+Five packages, three of them on top of the Go Snowball runtime, `github.com/blevesearch/snowballstem`:
 
 1. `greek`: the Snowball Greek stemmer, which snowballstem does not ship. `greek.Stem(env)`, same shape as every other language package.
 2. `stopwords`: the stop word lists snowballstem.org publishes beside its stemmers, embedded. Thirteen languages.
 3. `tokenize`: text to full-text search terms. Word segmentation, case folding, stop words, stemming in eighteen languages, ASCII folding, word positions. Plus a glob compiler and a fuzzy substring match.
 4. `bm25`: the Okapi BM25 term-score formulas. Standard library only.
+5. `trigram`: rune trigrams for a substring index, and the trigrams a glob, regex or fuzzy pattern requires. Standard library only.
 
 ## Tokenize
 
@@ -76,6 +77,19 @@ Languages: arabic, danish, dutch, english, finnish, french, german, greek, hunga
 2. Query-side saturation: `bm25.QueryTermWeight(qtf, bm25.K3)` for a term that occurs `qtf` times in the query.
 3. A document's score is the sum over query terms of the product of the two.
 
+## Trigrams
+
+1. Index: `trigram.Of(value)` per value. It lowercases, then takes every window of three runes.
+2. Query: `trigram.Glob(p)`, `trigram.Regex(p)` or `trigram.Fuzzy(p, distance)` give the grams a match must hold, folded the same way.
+3. Prune: a candidate lacking any required gram cannot match. For `Fuzzy`, it must hold at least `need` of them; `need <= 0` prunes nothing.
+
+```go
+trigram.Of("Hello")           // [hel ell llo]
+trigram.Glob("ab*cde")        // [cde]
+trigram.Regex(`(?i)abc.*xyz`) // [abc xyz]
+trigram.Fuzzy("hello", 0)     // [hel ell llo] 3
+```
+
 ## Facts
 
 - `greek/greek_stemmer.go` is Snowball v3.1.1 compiler output, unedited. Regenerate it, never edit it; the command is in `greek/doc.go`.
@@ -104,4 +118,4 @@ go test ./...
 ## License
 
 `greek` and `stopwords`: BSD-3-Clause, Snowball's terms, see [LICENSE](LICENSE); their loader and tests carry the same license.
-`bm25` and `tokenize`: MIT, see [bm25/LICENSE](bm25/LICENSE) and [tokenize/LICENSE](tokenize/LICENSE).
+`bm25`, `tokenize` and `trigram`: MIT, see [bm25/LICENSE](bm25/LICENSE), [tokenize/LICENSE](tokenize/LICENSE) and [trigram/LICENSE](trigram/LICENSE).
